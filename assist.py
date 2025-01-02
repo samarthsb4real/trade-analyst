@@ -2,6 +2,7 @@ import streamlit as st
 import requests
 import pandas as pd
 import plotly.express as px
+from streamlit_tags import st_tags
 from statsmodels.tsa.arima.model import ARIMA
 from datetime import datetime, timedelta
 
@@ -79,48 +80,66 @@ def analyze_stock(df):
         "reasoning": reasoning,
     }
 
+# Autocomplete stock symbols
+def fetch_stock_symbols():
+    return ["IBM", "AAPL", "GOOG", "TSLA", "MSFT", "AMZN", "META", "NFLX", "NVDA", "ADBE"]
+
 # Streamlit App
 st.title("Stock Market Assistant")
 st.sidebar.title("Stock Settings")
 
+# Autocomplete and wishlist feature
+available_symbols = fetch_stock_symbols()
+wishlist = st_tags(
+    label="Your Wishlist:",
+    text="Add stocks you're interested in (type and press enter)",
+    suggestions=available_symbols,
+    key="wishlist",
+)
+
 # Input for stock symbol
-stock_symbol = st.sidebar.text_input("Enter Stock Symbol:", "IBM").upper()
+st.sidebar.write("Search for a stock:")
+selected_stock = st.sidebar.selectbox("Select Stock Symbol", options=wishlist)
 interval = st.sidebar.selectbox("Interval", ["5min", "15min", "30min", "60min"], index=0)
 
-if st.sidebar.button("Analyze Stock"):
-    if stock_symbol:
-        stock_data = fetch_stock_data(stock_symbol, interval)
-        if stock_data:
-            df = process_time_series_data(stock_data)
-            st.write(f"### Analysis for {stock_symbol}")
-            st.write("#### Price Data")
-            st.dataframe(df.tail())
+if st.sidebar.button("Analyze Stock") and selected_stock:
+    stock_data = fetch_stock_data(selected_stock, interval)
+    if stock_data:
+        df = process_time_series_data(stock_data)
+        # Generate recommendations
+        analysis = analyze_stock(df)
+        
+        # Display actionable insights
+        st.markdown(
+            f"""
+            <div style="padding: 10px; border: 2px solid {analysis['color']}; border-radius: 5px; text-align: center;">
+                <h2 style="color: {analysis['color']};">{analysis['decision']}!</h2>
+                <p><b>When:</b> Immediately</p>
+                <p><b>Entry Price:</b> {analysis['entry_price'] if analysis['entry_price'] else 'N/A'}</p>
+                <p><b>Exit Price:</b> {analysis['exit_price'] if analysis['exit_price'] else 'N/A'}</p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
-            # Generate recommendations
-            analysis = analyze_stock(df)
+        # In-depth analysis
+        st.write("#### In-depth Analysis")
+        st.write(analysis["reasoning"])
+        
+        df = process_time_series_data(stock_data)
+        st.write(f"### Analysis for {selected_stock}")
+        st.write("#### Price Data")
+        st.dataframe(df.tail())
 
-            # Display actionable insights
-            st.markdown(
-                f"""
-                <div style="padding: 10px; border: 2px solid {analysis['color']}; border-radius: 5px; text-align: center;">
-                    <h2 style="color: {analysis['color']};">{analysis['decision']}!</h2>
-                    <p><b>When:</b> Immediately</p>
-                    <p><b>Entry Price:</b> {analysis['entry_price'] if analysis['entry_price'] else 'N/A'}</p>
-                    <p><b>Exit Price:</b> {analysis['exit_price'] if analysis['exit_price'] else 'N/A'}</p>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
-
-            # In-depth analysis
-            st.write("#### In-depth Analysis")
-            st.write(analysis["reasoning"])
-
-            # Visualizations
-            st.write("### Price Trends")
-            fig = px.line(df, x=df.index, y="close", title=f"{stock_symbol} Price Trends")
-            st.plotly_chart(fig)
-        else:
-            st.warning("Failed to fetch stock data. Please check the symbol or try again.")
+        # Visualizations
+        st.write("### Price Trends")
+        fig = px.line(df, x=df.index, y="close", title=f"{selected_stock} Price Trends")
+        st.plotly_chart(fig)
     else:
-        st.warning("Please enter a valid stock symbol.")
+        st.warning("Failed to fetch stock data. Please check the symbol or try again.")
+
+# Wishlist display
+if wishlist:
+    st.sidebar.write("#### Your Wishlist:")
+    for stock in wishlist:
+        st.sidebar.write(f"- {stock}")
