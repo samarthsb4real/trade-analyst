@@ -83,16 +83,24 @@ def analyze_stock(df):
         "reasoning": reasoning,
     }
 
-# Autocomplete stock symbols
-def fetch_stock_symbols():
-    return ["IBM", "AAPL", "GOOG", "TSLA", "MSFT", "AMZN", "META", "NFLX", "NVDA", "ADBE"]
+# Generate detailed report
+def generate_report(df, analysis, stock_symbol):
+    report = f"### Detailed Report for {stock_symbol}\n\n"
+    report += "#### Historical Data\n"
+    report += df.tail().to_csv(index=True)
+    report += "\n\n#### Analysis\n"
+    report += f"Decision: {analysis['decision']}\n"
+    report += f"Entry Price: {analysis['entry_price']}\n"
+    report += f"Exit Price: {analysis['exit_price']}\n"
+    report += f"Reasoning: {analysis['reasoning']}\n"
+    return report
 
 # Streamlit App
 st.title("Stock Market Assistant")
 st.sidebar.title("Stock Settings")
 
 # Autocomplete and wishlist feature
-available_symbols = fetch_stock_symbols()
+available_symbols = ["IBM", "AAPL", "GOOG", "TSLA", "MSFT", "AMZN", "META", "NFLX", "NVDA", "ADBE"]
 wishlist = st_tags(
     label="Your Wishlist:",
     text="Add stocks you're interested in (type and press enter)",
@@ -129,7 +137,6 @@ if st.sidebar.button("Analyze Stock") and selected_stock:
         st.write("#### In-depth Analysis")
         st.write(analysis["reasoning"])
         
-        df = process_time_series_data(stock_data)
         st.write(f"### Analysis for {selected_stock}")
         st.write("#### Price Data")
         st.dataframe(df.tail())
@@ -138,6 +145,15 @@ if st.sidebar.button("Analyze Stock") and selected_stock:
         st.write("### Price Trends")
         fig = px.line(df, x=df.index, y="close", title=f"{selected_stock} Price Trends")
         st.plotly_chart(fig)
+
+        # Generate and download report
+        report = generate_report(df, analysis, selected_stock)
+        st.download_button(
+            label="Download Detailed Report",
+            data=report,
+            file_name=f"{selected_stock}_report.txt",
+            mime="text/plain",
+        )
     else:
         st.warning("Failed to fetch stock data. Please check the symbol or try again.")
 
