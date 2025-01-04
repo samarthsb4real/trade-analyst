@@ -5,9 +5,12 @@ import plotly.express as px
 from streamlit_tags import st_tags
 from statsmodels.tsa.arima.model import ARIMA
 from datetime import datetime, timedelta
+from dotenv import load_dotenv
+import os
 
-# Alpha Vantage API credentials
-API_KEY = "L18QHHMC7G5XQUMI"
+# Load environment variables
+load_dotenv(".env.local")
+API_KEY = os.getenv("ALPHA_VANTAGE_API_KEY")
 BASE_URL = "https://www.alphavantage.co/query"
 
 # Fetch stock data
