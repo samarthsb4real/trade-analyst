@@ -5,9 +5,16 @@ import plotly.express as px
 from statsmodels.tsa.arima.model import ARIMA
 from datetime import datetime
 import json
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from .env.local
+load_dotenv(".env.local")
 
 # Alpha Vantage API credentials
-API_KEY = "L18QHHMC7G5XQUMI"
+API_KEY = os.getenv("ALPHA_VANTAGE_API_KEY")
+if not API_KEY:
+    st.error("API key is missing. Please add it to the .env.local file.")
 BASE_URL = "https://www.alphavantage.co/query"
 
 # Autocomplete function to search for companies
