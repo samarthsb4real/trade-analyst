@@ -1,7 +1,7 @@
-# Trade Project
+# Stock Market Assistant
 
 ## Overview
-The Trade Project is a basic tool designed to help analyze stock trading activities. It provides features to fetch real-time stock data, analyze trends, and make buy or sell recommendations, making trading easier to just give a basic suggestions for the real-time situation.
+The Stock Market Assistant is a basic tool designed to help analyze stock trading activities. It provides features to fetch real-time stock data, analyze trends, and make buy or sell recommendations, making trading easier to just give a basic suggestions for the real-time situation.
 
 ## Features
 - Real-time market data
