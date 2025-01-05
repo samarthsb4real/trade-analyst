@@ -1,7 +1,7 @@
 # Trade Project
 
 ## Overview
-The Trade Project is a comprehensive solution designed to facilitate and manage trading activities. It provides tools and features to streamline the trading process, ensuring efficiency and accuracy.
+The Trade Project is a basic tool designed to help analyze stock trading activities. It provides features to fetch real-time stock data, analyze trends, and make buy or sell recommendations, making trading easier to just give a basic suggestions for the real-time situation.
 
 ## Features
 - Real-time market data
