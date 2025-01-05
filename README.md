@@ -29,5 +29,5 @@ To install the Trade Project, follow these steps:
 ## Usage
 To start the application, run:
 ```bash
-npm start
+streamlit run assist.py
 ```
